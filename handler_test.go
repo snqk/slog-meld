@@ -1,4 +1,4 @@
-package slogmeld
+package meld
 
 import (
 	"bytes"
