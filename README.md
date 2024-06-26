@@ -3,7 +3,7 @@
 [![Go Reference](https://pkg.go.dev/badge/snqk.dev/slog/meld.svg)](https://pkg.go.dev/snqk.dev/slog/meld)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-`slog/meld` is a slog handler designed to recursively merge and de-duplicate log attributes, ensuring clean, concise, and informative log entries.
+`slog/meld` provides a simple `slog.Handler` designed to recursively merge and de-duplicate log attributes, ensuring clean, concise, and informative log entries.
 
 ## Installation
 
@@ -22,9 +22,8 @@ go get -u snqk.dev/slog/meld
 
 ## Considerations
 
-* **Thread Safety:** A `sync.RWMutex` ensures merge operations do not conflict with each other. 
+* **Thread Safety:** A `sync.RWMutex` ensures merge operations do not conflict with each other.
 * **Greedy Merge:** Attributes are merged ahead-of-time vs when logging, where possible. IE when calling `Logger.With()` or `Logger.WithGroup()`.
-
 ## Usage
 ### Wrap `slog.Default()`
 For most implementations, the following wrapper would suffice.
@@ -37,13 +36,13 @@ For custom loggers, the bootstrap is similar.
 ```go
 log := slog.New(meld.NewHandler(slog.NewJSONHandler(os.Stdout, nil)))
 // do stuff...
-log1 := log.With(slog.Group("alice", slog.String("foo", "goo"), slog.String("bar", "baz")))
+log1 := log.With(slog.Group("alice", slog.String("foo", "initial_attr"), slog.String("bar", "old_attr")))
 // do stuff...
-log2 := log1.With(slog.Group("alice", slog.String("foo", "boo"), slog.String("qux", "quux")))
+log2 := log1.With(slog.Group("alice", slog.String("foo", "overwritten_attr"), slog.String("qux", "new_attr")))
 // do stuff...
 log3 := log2.WithGroup("bob")
 // do stuff...
-log3.Info("hello_world", "foo", "lorem_ipsum")
+log3.Info("hello_world", "foo", "inline_attr")
 ```
 
 ```json
@@ -51,12 +50,12 @@ log3.Info("hello_world", "foo", "lorem_ipsum")
   "level": "INFO",
   "msg": "hello_world",
   "alice": {
-    "foo": "boo",
-    "bar": "baz",
-    "qux": "quux"
+    "foo": "overwritten_attr",
+    "bar": "old_attr",
+    "qux": "new_attr"
   },
   "bob": {
-    "foo": "lorem_ipsum"
+    "foo": "inline_attr"
   }
 }
 ```
