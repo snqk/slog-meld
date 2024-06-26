@@ -91,10 +91,10 @@ func TestHandler(t *testing.T) {
 	}
 }
 
-func BenchmarkNewHandler(b *testing.B) {
+func BenchmarkDefaultLogger(b *testing.B) {
 	b.ReportAllocs()
 
-	log := slog.New(NewHandler(slog.NewTextHandler(io.Discard, nil)))
+	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
@@ -106,10 +106,10 @@ func BenchmarkNewHandler(b *testing.B) {
 	})
 }
 
-func BenchmarkDefaultHandler(b *testing.B) {
+func BenchmarkMeldLogger(b *testing.B) {
 	b.ReportAllocs()
 
-	log := slog.New(slog.NewTextHandler(io.Discard, nil))
+	log := slog.New(NewHandler(slog.NewTextHandler(io.Discard, nil)))
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
