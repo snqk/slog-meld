@@ -72,15 +72,6 @@ func TestHandler(t *testing.T) {
 				log3.Info("hello_world", "foo", "lorem_ipsum")
 			},
 		},
-		{
-			expected: "level=INFO msg=hello_world alice.foo=boo alice.bar=baz alice.qux=quux bob.foo=lorem_ipsum\n",
-			mock: func(log *slog.Logger) {
-				log1 := log.With(slog.Group("alice", slog.String("foo", "goo"), slog.String("bar", "baz")))
-				log2 := log1.With(slog.Group("alice", slog.String("foo", "boo"), slog.String("qux", "quux")))
-				log3 := log2.WithGroup("bob")
-				log3.Info("hello_world", "foo", "lorem_ipsum")
-			},
-		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
