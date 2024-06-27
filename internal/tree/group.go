@@ -20,8 +20,8 @@ func (g *Group) Clone() *Group {
 	g.m.RLock()
 	defer g.m.RUnlock()
 
-	for k, v := range g.vs {
-		n.vs[k] = v.clone()
+	for i, v := range g.vs {
+		n.vs[i] = v.clone()
 	}
 
 	return n
@@ -33,9 +33,10 @@ func (g *Group) Render() []slog.Attr {
 	g.m.RLock()
 	defer g.m.RUnlock()
 
-	for _, v := range g.vs {
-		out = append(out, slog.Attr{Key: v.name, Value: v.LogValue()})
+	for i, v := range g.vs {
+		out[i] = slog.Attr{Key: v.name, Value: v.LogValue()}
 	}
+
 	return out
 }
 

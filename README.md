@@ -155,18 +155,26 @@ Benchmarks were also performed against the scenario above, comparing `log/slog`,
 `veqryn/slog-dedup.NewOverwriteHandler`.
 
 ```
-$ go test -bench=. -benchtime 2s -benchmem -cpu 1,2,4 -run notest
+$ go test -bench=. -benchtime 2s -benchmem -cpu 1,2,4,8,16 -run notest
 goos: linux
 goarch: amd64
-BenchmarkDefaultLogger       	  481646	      4877 ns/op	    1272 B/op	      25 allocs/op
-BenchmarkDefaultLogger-2     	  715798	      2876 ns/op	    1272 B/op	      25 allocs/op
-BenchmarkDefaultLogger-4     	 1753418	      1432 ns/op	    1272 B/op	      25 allocs/op
-BenchmarkMeldLogger          	  254832	      8926 ns/op	    3216 B/op	      73 allocs/op
-BenchmarkMeldLogger-2        	  432796	      5033 ns/op	    3216 B/op	      73 allocs/op
-BenchmarkMeldLogger-4        	  983511	      2457 ns/op	    3217 B/op	      73 allocs/op
-BenchmarkOverwriteLogger     	  111040	     19365 ns/op	   13118 B/op	      65 allocs/op
-BenchmarkOverwriteLogger-2   	  222187	     10740 ns/op	   14016 B/op	      65 allocs/op
-BenchmarkOverwriteLogger-4   	  230452	     18207 ns/op	   15753 B/op	      65 allocs/op
+pkg: snqk.dev/slog/meld
+cpu: Intel(R) Core(TM) i7-5960X CPU @ 3.00GHz
+BenchmarkDefaultLogger            721747              3671 ns/op            1272 B/op         25 allocs/op
+BenchmarkDefaultLogger-2         1000000              2146 ns/op            1272 B/op         25 allocs/op
+BenchmarkDefaultLogger-4         2117403              1132 ns/op            1272 B/op         25 allocs/op
+BenchmarkDefaultLogger-8         2331649              1053 ns/op            1274 B/op         25 allocs/op
+BenchmarkDefaultLogger-16        1939368              1335 ns/op            1278 B/op         25 allocs/op
+BenchmarkMeldLogger               369272              6351 ns/op            2736 B/op         70 allocs/op
+BenchmarkMeldLogger-2             658176              3626 ns/op            2736 B/op         70 allocs/op
+BenchmarkMeldLogger-4            1216179              1962 ns/op            2737 B/op         70 allocs/op
+BenchmarkMeldLogger-8            1000000              2017 ns/op            2741 B/op         70 allocs/op
+BenchmarkMeldLogger-16            979236              2453 ns/op            2750 B/op         70 allocs/op
+BenchmarkOverwriteLogger          131522             15580 ns/op           13099 B/op         65 allocs/op
+BenchmarkOverwriteLogger-2        259272              9128 ns/op           14019 B/op         65 allocs/op
+BenchmarkOverwriteLogger-4        245490              8277 ns/op           15768 B/op         65 allocs/op
+BenchmarkOverwriteLogger-8        201349             10045 ns/op           20256 B/op         65 allocs/op
+BenchmarkOverwriteLogger-16       199776             12011 ns/op           28338 B/op         65 allocs/op
 PASS
-ok  	snqk.dev/slog/meld	28.032s
+ok      snqk.dev/slog/meld      42.994s
 ```
