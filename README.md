@@ -17,8 +17,8 @@ go get -u snqk.dev/slog/meld
 * **Attribute Merging:** Combines attributes with the same key, while preserving context.
 * **Recursive Group Merging:**  Handles nested `slog.Group` attributes, ensuring proper merging at all levels.
 * **De-duplication:** Eliminates duplicate keys within groups, preventing cluttered logs.
-* **Order Preservation:** Maintains the original order of attributes, even after merging or replacing.
-* **Zero Dependency:** A pure go library without any dependencies.
+* **Order Preservation:** Maintains the original order of attributes as they were defined, even after merging or replacing.
+* **Lightweight:** A pure go library without any dependencies.
 * **Simplified Bootstrap:** Doesn't require any configuration options.
 
 ## Considerations
@@ -47,8 +47,9 @@ func init() {
 }
 ```
 
-### Example
-**Play:** https://play.golang.com/p/Tkj5CBiKnZt
+### Example with Comparisons
+
+**Play:** https://go.dev/play/p/7r6D-reA4Pd
 
 ```go
 package main
@@ -57,23 +58,31 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/veqryn/slog-dedup"
 	"snqk.dev/slog/meld"
 )
 
 func main() {
-	log := slog.New(meld.NewHandler(slog.NewJSONHandler(os.Stdout, nil)))
+	hello(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	hello(slog.New(slogdedup.NewOverwriteHandler(slog.NewJSONHandler(os.Stdout, nil), nil)))
+	hello(slog.New(meld.NewHandler(slog.NewJSONHandler(os.Stdout, nil))))
+}
+
+func hello(log *slog.Logger) {
+	log = log.With(slog.Group("alice", slog.String("foo", "initial_attr"), slog.String("bar", "old_attr")))
 	// do stuff...
-	log1 := log.With(slog.Group("alice", slog.String("foo", "initial_attr"), slog.String("bar", "old_attr")))
+	log = log.With(slog.Group("alice", slog.String("foo", "overwritten_attr"), slog.String("qux", "new_attr")))
 	// do stuff...
-	log2 := log1.With(slog.Group("alice", slog.String("foo", "overwritten_attr"), slog.String("qux", "new_attr")))
+	log = log.WithGroup("bob")
 	// do stuff...
-	log3 := log2.WithGroup("bob")
-	// do stuff...
-	log3.Info("hello_world", "foo", "inline_attr")
+	log.Info("hello_world", "foo", "inline_attr")
 }
 ```
 
-Output (Formatted):
+#### Output using `slog/meld`
+
+Newer attributes are overlay on top of the older tree, and merged together.
+
 ```json
 {
   "time": "2009-11-10T23:00:00Z",
@@ -89,10 +98,62 @@ Output (Formatted):
   }
 }
 ```
-**NOTE:** merging attributes means we're only ever appending &/ updating older values. We never delete older attributes. For conditionally removable attributes, implement `slog.LogValuer`.
+
+This approach means we only ever append &/ update older values, never deleting any attributes.
+This makes `slog/meld` partially immutable, where the keys cannot be changed, but their values are mutable.
+
+Alternatively, consider implementing `slog.LogValuer` for dynamically rendering attributes for different situations.
+
+#### Output using `log/slog`
+
+The fully immutable nature of `log/slog` means we can't modify previously added attributes (keys and values), only add more of the same as their duplicates.
+
+```json
+{
+  "time": "2009-11-10T23:00:00Z",
+  "level": "INFO",
+  "msg": "hello_world",
+  "alice": {
+    "foo": "initial_attr",
+    "bar": "old_attr"
+  },
+  "alice": {
+    "foo": "overwritten_attr",
+    "qux": "new_attr"
+  },
+  "bob": {
+    "foo": "inline_attr"
+  }
+}
+```
+
+While this is legal JSON, parsers like `jq` will process it by overwriting earlier values with later ones.
+Doing so results in the same output as from `veqryn/slog-dedup.NewOverwriteHandler`.
+
+#### Output using `veqryn/slog-dedup.NewOverwriteHandler`
+
+Here, `{"bar": "old_attr"}` is missing due to its parent group being completely overwritten, as deduplication alone isn't meant to handle attribute merging.
+
+```json
+{
+  "time": "2009-11-10T23:00:00Z",
+  "level": "INFO",
+  "msg": "hello_world",
+  "alice": {
+    "foo": "overwritten_attr",
+    "qux": "new_attr"
+  },
+  "bob": {
+    "foo": "inline_attr"
+  }
+}
+```
 
 ## Benchmarks
-Benchmarks were also performed against the scenario above, comparing `log/slog`, `slog/meld`, and `veqryn/slog-dedup.NewOverwriteHandler`.
+
+Benchmarks were also performed against the scenario above, comparing `log/slog`, `slog/meld`, and
+`veqryn/slog-dedup.NewOverwriteHandler`.
+
 ```
 $ go test -bench=. -benchtime 2s -benchmem -cpu 1,2,4 -run notest
 goos: linux
