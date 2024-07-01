@@ -14,7 +14,7 @@ type handler struct {
 }
 
 // NewHandler returns a slog.Handler which melds (joins) older slog.Attr(s) with newer updates, making it a mutable slog.Handler.
-// It is thread-safe, using a sync.RWMutex.
+// It is thread-safe by immutability; handler state is never updated in-place after creation.
 // It is recursive; merging slog.KindGroup, and replacing / updating all other types as appropriate.
 // It is ordered; slog.Attr(s) configured first will appear in order. Replacing an attribute does not change its position in the order.
 func NewHandler(next slog.Handler) slog.Handler {

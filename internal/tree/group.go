@@ -2,11 +2,9 @@ package tree
 
 import (
 	"log/slog"
-	"sync"
 )
 
 type Group struct {
-	m  sync.RWMutex
 	vs []*value
 }
 
@@ -16,9 +14,6 @@ func (g *Group) LogValue() slog.Value {
 
 func (g *Group) Clone() *Group {
 	n := &Group{vs: make([]*value, len(g.vs))}
-
-	g.m.RLock()
-	defer g.m.RUnlock()
 
 	for i, v := range g.vs {
 		n.vs[i] = v.clone()
@@ -30,9 +25,6 @@ func (g *Group) Clone() *Group {
 func (g *Group) Render() []slog.Attr {
 	out := make([]slog.Attr, len(g.vs))
 
-	g.m.RLock()
-	defer g.m.RUnlock()
-
 	for i, v := range g.vs {
 		out[i] = slog.Attr{Key: v.name, Value: v.LogValue()}
 	}
@@ -41,9 +33,6 @@ func (g *Group) Render() []slog.Attr {
 }
 
 func (g *Group) Merge(stack []string, attrs ...slog.Attr) {
-	g.m.Lock()
-	defer g.m.Unlock()
-
 	for i := range attrs {
 		merge(g, stack, attrs[i])
 	}
