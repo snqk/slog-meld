@@ -155,26 +155,26 @@ Benchmarks were also performed against the scenario above, comparing `log/slog`,
 `veqryn/slog-dedup.NewOverwriteHandler`.
 
 ```
-$ go test -bench=. -benchtime 2s -benchmem -cpu 1,2,4,8,16 -run notest
+$ go test -bench=. -benchtime 4s -benchmem -cpu 1,2,4,8,16 -run notest
 goos: linux
 goarch: amd64
 pkg: snqk.dev/slog/meld
 cpu: Intel(R) Core(TM) i7-5960X CPU @ 3.00GHz
-BenchmarkDefaultLogger            721747              3671 ns/op            1272 B/op         25 allocs/op
-BenchmarkDefaultLogger-2         1000000              2146 ns/op            1272 B/op         25 allocs/op
-BenchmarkDefaultLogger-4         2117403              1132 ns/op            1272 B/op         25 allocs/op
-BenchmarkDefaultLogger-8         2331649              1053 ns/op            1274 B/op         25 allocs/op
-BenchmarkDefaultLogger-16        1939368              1335 ns/op            1278 B/op         25 allocs/op
-BenchmarkMeldLogger               369272              6351 ns/op            2736 B/op         70 allocs/op
-BenchmarkMeldLogger-2             658176              3626 ns/op            2736 B/op         70 allocs/op
-BenchmarkMeldLogger-4            1216179              1962 ns/op            2737 B/op         70 allocs/op
-BenchmarkMeldLogger-8            1000000              2017 ns/op            2741 B/op         70 allocs/op
-BenchmarkMeldLogger-16            979236              2453 ns/op            2750 B/op         70 allocs/op
-BenchmarkOverwriteLogger          131522             15580 ns/op           13099 B/op         65 allocs/op
-BenchmarkOverwriteLogger-2        259272              9128 ns/op           14019 B/op         65 allocs/op
-BenchmarkOverwriteLogger-4        245490              8277 ns/op           15768 B/op         65 allocs/op
-BenchmarkOverwriteLogger-8        201349             10045 ns/op           20256 B/op         65 allocs/op
-BenchmarkOverwriteLogger-16       199776             12011 ns/op           28338 B/op         65 allocs/op
+BenchmarkDefaultLogger           1306116              3653 ns/op            1272 B/op         25 allocs/op
+BenchmarkDefaultLogger-2         2257365              2152 ns/op            1272 B/op         25 allocs/op
+BenchmarkDefaultLogger-4         4360447              1102 ns/op            1272 B/op         25 allocs/op
+BenchmarkDefaultLogger-8         4590700              1073 ns/op            1274 B/op         25 allocs/op
+BenchmarkDefaultLogger-16        3770030              1267 ns/op            1278 B/op         25 allocs/op
+BenchmarkMeldLogger               830655              5680 ns/op            2392 B/op         62 allocs/op
+BenchmarkMeldLogger-2            1460762              3385 ns/op            2392 B/op         62 allocs/op
+BenchmarkMeldLogger-4            2653039              1793 ns/op            2393 B/op         62 allocs/op
+BenchmarkMeldLogger-8            2548966              1844 ns/op            2397 B/op         62 allocs/op
+BenchmarkMeldLogger-16           2263243              2224 ns/op            2404 B/op         62 allocs/op
+BenchmarkOverwriteLogger          301058             18183 ns/op           13134 B/op         65 allocs/op
+BenchmarkOverwriteLogger-2        483166              9033 ns/op           14032 B/op         65 allocs/op
+BenchmarkOverwriteLogger-4        557324              9961 ns/op           15775 B/op         65 allocs/op
+BenchmarkOverwriteLogger-8        422300             10334 ns/op           20254 B/op         65 allocs/op
+BenchmarkOverwriteLogger-16       395548             12089 ns/op           28342 B/op         65 allocs/op
 PASS
-ok      snqk.dev/slog/meld      42.994s
+ok      snqk.dev/slog/meld      96.097s
 ```
