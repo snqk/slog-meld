@@ -23,7 +23,7 @@ go get -u snqk.dev/slog/meld
 
 ## Considerations
 
-* **Thread Safety:** A `sync.RWMutex` ensures merge operations do not conflict with each other.
+* **Thread Safety:** Handler immutability ensures merge operations do not conflict with each other.
 * **Greedy Merge:** Attributes are merged ahead-of-time vs when logging, where possible. IE when calling `Logger.With()`
   or `Logger.WithGroup()`.
 

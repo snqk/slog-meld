@@ -46,6 +46,7 @@ func merge(in *Group, stack []string, attr slog.Attr) {
 		if l.vs[i].name == attr.Key {
 			if attr.Value.Kind() != slog.KindGroup {
 				l.vs[i].v = attr.Value
+				l.vs[i].g = nil
 				return
 			}
 
