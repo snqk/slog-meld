@@ -2,10 +2,12 @@ package meld
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"log/slog"
 	"strconv"
 	"testing"
+	"testing/slogtest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -89,6 +91,24 @@ func TestHandler(t *testing.T) {
 			assert.Equal(t, test.expected, buf.String())
 		})
 	}
+}
+
+func Test_slogtest_json(t *testing.T) {
+	var buf bytes.Buffer
+
+	newHandler := func(*testing.T) slog.Handler {
+		buf.Reset()
+		return NewHandler(slog.NewJSONHandler(&buf, nil))
+	}
+	result := func(t *testing.T) map[string]any {
+		m := map[string]any{}
+		if err := json.Unmarshal(buf.Bytes(), &m); err != nil {
+			t.Fatal(err)
+		}
+		return m
+	}
+
+	slogtest.Run(t, newHandler, result)
 }
 
 func BenchmarkDefaultLogger(b *testing.B) {
